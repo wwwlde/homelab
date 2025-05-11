@@ -1,0 +1,21 @@
+---
+# yaml-language-server: $schema=https://taskfile.dev/schema.json
+version: '3'
+
+tasks:
+
+  apps:
+    desc: Bootstrap apps into the Talos cluster
+    cmds:
+      - |
+        if [ -z "$CLUSTER_NAME" ]; then
+          read -p "Enter cluster name: " CLUSTER_NAME
+        fi
+        bash {{.SCRIPTS_DIR}}/bootstrap-apps.sh "$CLUSTER_NAME"
+    preconditions:
+      # - msg: Unsupported bash version, run `brew install bash` to upgrade
+      #   sh: '{{if eq OS "darwin"}}test -f /opt/homebrew/bin/bash || test -f /usr/local/bin/bash{{end}}'
+      - test -f {{.KUBECONFIG}}
+      - test -f {{.ROOT_DIR}}/.sops.yaml
+      - test -f {{.SCRIPTS_DIR}}/bootstrap-apps.sh
+      - test -f {{.SOPS_AGE_KEY_FILE}}
